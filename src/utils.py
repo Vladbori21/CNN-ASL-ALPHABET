@@ -1,4 +1,8 @@
 import os
+from torchvision import transforms
+from torchvision.datasets import ImageFolder
+from torch.utils.data import random_split
+from torch.utils.data import DataLoader
 
 def organize_test_folder(path):
     for file in os.listdir(path):
@@ -15,3 +19,30 @@ def organize_test_folder(path):
             full_path,
             os.path.join(class_dir, file)
         )
+
+def load_train_data(train_root, batch_size=128):
+
+
+
+        train_transform = transforms.Compose([
+            transforms.Resize((150, 150)),
+            transforms.RandomCrop((128, 128)),
+            transforms.ToTensor()
+        ])
+
+        test_transform = transforms.Compose([
+            transforms.Resize((128, 128)),
+            transforms.ToTensor()
+        ])
+
+        data = ImageFolder(root = train_root, transform=train_transform)
+
+        train_size = int(0.8 * len(data))
+        val_size = len(data) - train_size
+
+        train_data, val_data = random_split(data, [train_size, val_size])
+
+        train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+        val_loader = DataLoader(val_data, batch_size=batch_size)
+
+        return train_loader, val_loader

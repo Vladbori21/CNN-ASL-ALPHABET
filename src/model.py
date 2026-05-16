@@ -1,17 +1,14 @@
 import torch
 from torch import nn
 import torch.optim as optim
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader, random_split
-from torchvision.datasets import ImageFolder
-from torchvision import transforms
 import numpy as np
 
 
 class CNN(nn.Module):
 
-    def __init__(self):
+    def __init__(self, device='cpu'):
         super().__init__()
+        self.device = device
 
         self.conv_part = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3),
@@ -46,35 +43,39 @@ class CNN(nn.Module):
             nn.Linear(in_features=256, out_features=29)
         )
 
+        self.to(self.device)
+
     def forward(self, x):
-        x = self.conv_part(input)
+        x = self.conv_part(x)
         x = self.mlp_part(x)
         return x
 
 
     def _conv_output(self):
-        x = torch.randn(1, 3, 128, 128)
+        x = torch.randn(1, 3, 128, 128, device=self.device)
         output = self.conv_part(x)
 
         _, c, h, w = output.shape
 
         return c*h*w
 
-    def my_train(self, epochs, print_every=1):
+    def my_train(self, train_loader, val_loader, epochs, print_every=1):
 
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(self.parameters(), lr=0.0001)
 
-        train_loader = DataLoader(self.train_data, batch_size=128, shuffle=True)
-        val_loader = DataLoader(self.val_data, batch_size=128)
+        
 
         for epoch in range(epochs):
             train_losses = []
             train_acc = []
-            val_acc = []
+            
 
             self.train()
             for images, labels in train_loader:
+                images = images.to(self.device)
+                labels = labels.to(self.device)
+
                 output = self(images)
                 loss = criterion(output, labels)
 
@@ -82,21 +83,26 @@ class CNN(nn.Module):
                 loss.backward()
                 optimizer.step()
 
-                preds = torch.argmax(output)
-                acc = torch.mean(preds == labels).item()
+                preds = torch.argmax(output, dim=1)
+                acc = torch.mean((preds == labels).float()).item()
                 train_acc.append(acc)
                 train_losses.append(loss.item())
 
 
             if (epoch + 1) % print_every == 0:
+                val_acc = []
 
                 self.eval()
-                for images, labels in val_loader:
-                    output = self(images)
+                with torch.no_grad():
+                    for images, labels in val_loader:
+                        images = images.to(self.device)
+                        labels = labels.to(self.device)
 
-                    preds = torch.argmax(output)
-                    acc = torch.mean(preds == labels).item()
-                    val_acc.append(acc)
+                        output = self(images)
+
+                        preds = torch.argmax(output, dim=1)
+                        acc = torch.mean((preds == labels).float()).item()
+                        val_acc.append(acc)
 
                 t_acc = np.mean(train_acc)
                 v_acc = np.mean(val_acc)
@@ -107,25 +113,4 @@ class CNN(nn.Module):
 
 
 
-    def load_data(self, train_root, test_root):
-
-
-
-        train_transform = transforms.Compose([
-            transforms.Resize((150, 150)),
-            transforms.RandomCrop((128, 128)),
-            transforms.ToTensor()
-        ])
-
-        test_transform = transforms.Compose([
-            transforms.Resize((128, 128)),
-            transforms.ToTensor()
-        ])
-
-        self.test_data = ImageFolder(root=test_root, transform=test_transform)
-        data = ImageFolder(root = train_root, transform=train_transform)
-
-        train_size = int(0.8 * len(data))
-        val_size = len(data) - train_size
-
-        self.train_data, self.val_data = random_split(data, [train_size, val_size])
+    
