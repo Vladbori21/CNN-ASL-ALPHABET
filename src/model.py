@@ -6,7 +6,7 @@ import numpy as np
 
 class CNN(nn.Module):
 
-    def __init__(self, device='cpu'):
+    def __init__(self, device=torch.device('cpu')):
         super().__init__()
         self.device = device
 
@@ -52,7 +52,7 @@ class CNN(nn.Module):
 
 
     def _conv_output(self):
-        x = torch.randn(1, 3, 128, 128, device=self.device)
+        x = torch.randn(1, 3, 128, 128)
         output = self.conv_part(x)
 
         _, c, h, w = output.shape
@@ -108,9 +108,3 @@ class CNN(nn.Module):
                 v_acc = np.mean(val_acc)
                 t_loss = np.mean(train_losses)
                 print(f'epoch: {epoch+1} loss: {t_loss:.4f} train acc: {t_acc:.4f} val acc: {v_acc:.4f}')
-
-
-
-
-
-    

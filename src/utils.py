@@ -27,6 +27,9 @@ def load_train_data(train_root, batch_size=128):
         train_transform = transforms.Compose([
             transforms.Resize((150, 150)),
             transforms.RandomCrop((128, 128)),
+            transforms.RandomRotation(degrees=15), 
+            transforms.ColorJitter(brightness=0.2, contrast=0.2),
+            transforms.RandomGaussianBlur(kernel_size=(3, 3), sigma=(0.1, 2.0)),
             transforms.ToTensor()
         ])
 
