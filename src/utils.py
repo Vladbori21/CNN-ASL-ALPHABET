@@ -1,24 +1,7 @@
-import os
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 from torch.utils.data import random_split
 from torch.utils.data import DataLoader
-
-def organize_test_folder(path):
-    for file in os.listdir(path):
-        full_path = os.path.join(path, file)
-
-        if not os.path.isfile(full_path):
-            continue
-
-        label = file.split('.')[0]
-        class_dir = os.path.join(path, label)
-
-        os.makedirs(class_dir, exist_ok=True)
-        os.rename(
-            full_path,
-            os.path.join(class_dir, file)
-        )
 
 def load_train_data(train_root, batch_size=128):
 
@@ -29,12 +12,6 @@ def load_train_data(train_root, batch_size=128):
             transforms.RandomCrop((128, 128)),
             transforms.RandomRotation(degrees=15), 
             transforms.ColorJitter(brightness=0.2, contrast=0.2),
-            transforms.RandomGaussianBlur(kernel_size=(3, 3), sigma=(0.1, 2.0)),
-            transforms.ToTensor()
-        ])
-
-        test_transform = transforms.Compose([
-            transforms.Resize((128, 128)),
             transforms.ToTensor()
         ])
 
@@ -49,3 +26,14 @@ def load_train_data(train_root, batch_size=128):
         val_loader = DataLoader(val_data, batch_size=batch_size)
 
         return train_loader, val_loader
+
+def load_test_data(test_root, batch_size=128):
+    test_transform = transforms.Compose([
+            transforms.Resize((128, 128)),
+            transforms.ToTensor()
+        ])
+
+    test_data = ImageFolder(root = test_root, transform=test_transform)
+    test_loader = DataLoader(test_data, batch_size=batch_size)
+
+    return test_loader

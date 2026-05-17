@@ -58,6 +58,25 @@ class CNN(nn.Module):
         _, c, h, w = output.shape
 
         return c*h*w
+    
+    def test(self, test_loader):
+        test_acc = []
+
+        self.eval()
+        with torch.no_grad():
+            for images, labels in test_loader:
+                images = images.to(self.device)
+                labels = labels.to(self.device)
+
+                output = self(images)
+
+                preds = torch.argmax(output, dim=1)
+                acc = torch.mean((preds == labels).float()).item()
+                test_acc.append(acc)
+
+        t_acc = np.mean(test_acc)
+        print(f'test accuracy: {t_acc}')
+
 
     def my_train(self, train_loader, val_loader, epochs, print_every=1):
 
