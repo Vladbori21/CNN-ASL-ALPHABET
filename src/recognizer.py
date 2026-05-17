@@ -11,7 +11,7 @@ if not cap.isOpened():
     exit()
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model_path = os.path.join('models', 'cnn_asl.pth')
+model_path = os.path.join('..', 'models', 'cnn_asl.pth')
 
 recognizer = md.CNN(device=device)
 recognizer.load_state_dict(torch.load(model_path, map_location=device))
@@ -34,7 +34,7 @@ while True:
         break
 
     image = frame[box_y:(box_y+box_h)][box_x:(box_x+box_w)]
-    image = cv2.resize(image, (128, 128))
+    image = cv2.resize(image, (200, 200))
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = cv2.astype(np.float32)/255
     image = np.transpose(image, (2, 0, 1))

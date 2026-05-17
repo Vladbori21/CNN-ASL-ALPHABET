@@ -8,8 +8,8 @@ def load_train_data(train_root, batch_size=128):
 
 
         train_transform = transforms.Compose([
-            transforms.Resize((150, 150)),
-            transforms.RandomCrop((128, 128)),
+            transforms.Resize((240, 240)),
+            transforms.RandomCrop((200, 200)),
             transforms.RandomRotation(degrees=15), 
             transforms.ColorJitter(brightness=0.2, contrast=0.2),
             transforms.ToTensor()
@@ -29,7 +29,7 @@ def load_train_data(train_root, batch_size=128):
 
 def load_test_data(test_root, batch_size=128):
     test_transform = transforms.Compose([
-            transforms.Resize((128, 128)),
+            transforms.Resize((200, 200)),
             transforms.ToTensor()
         ])
 
