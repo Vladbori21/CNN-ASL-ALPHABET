@@ -24,8 +24,6 @@ box_w, box_h = 300, 300
 CLASSES = list(string.ascii_uppercase)
 CLASSES.insert(2, 'Blank')
 
-temp = torch.randn((1, 3, 200, 200), device=device)
-
 print("Покажите жест в квадрате. Чтобы выйти нажмите 'q'.")
 
 while True:

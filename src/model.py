@@ -38,9 +38,9 @@ class CNN(nn.Module):
 
         self.mlp_part = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(in_features=self._conv_output(), out_features=256),
+            nn.Linear(in_features=self._conv_output(), out_features=512),
             nn.ReLU(),
-            nn.Linear(in_features=256, out_features=29)
+            nn.Linear(in_features=512, out_features=27)
         )
 
         self.to(self.device)
@@ -58,7 +58,7 @@ class CNN(nn.Module):
         _, c, h, w = output.shape
 
         return c*h*w
-    
+
     def test(self, test_loader):
         test_acc = []
 
@@ -83,12 +83,12 @@ class CNN(nn.Module):
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(self.parameters(), lr=0.0001)
 
-        
+
 
         for epoch in range(epochs):
             train_losses = []
             train_acc = []
-            
+
 
             self.train()
             for images, labels in train_loader:
