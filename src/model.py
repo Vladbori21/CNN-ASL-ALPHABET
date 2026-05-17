@@ -52,7 +52,7 @@ class CNN(nn.Module):
 
 
     def _conv_output(self):
-        x = torch.randn(1, 3, 128, 128)
+        x = torch.randn(1, 3, 200, 200)
         output = self.conv_part(x)
 
         _, c, h, w = output.shape
